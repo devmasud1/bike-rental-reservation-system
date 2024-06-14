@@ -1,10 +1,13 @@
 import express, { Request, Response } from "express";
+import config from "./app/config";
+import cors from "cors";
+import { UserRoutes } from "./app/user/user.routes";
 
-import config from "./config";
 const app = express();
 
 //parser
 app.use(express.json());
+app.use(cors());
 
 // root route message
 app.get("/", (req: Request, res: Response) => {
@@ -15,6 +18,7 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 //routes
+app.use("/api", UserRoutes);
 
 app.get("/", (req: Request, res: Response) => {
   res.send(`Server is running on port ${config.port}`);
