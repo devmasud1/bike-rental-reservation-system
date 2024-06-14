@@ -1,7 +1,8 @@
 import express, { Request, Response } from "express";
 import config from "./app/config";
 import cors from "cors";
-import { UserRoutes } from "./app/user/user.routes";
+import { UserRoutes } from "./app/modules/user/user.routes";
+import notFoundRoute from "./app/error/notFound";
 
 const app = express();
 
@@ -19,6 +20,9 @@ app.get("/", (req: Request, res: Response) => {
 
 //routes
 app.use("/api", UserRoutes);
+
+//unmatched route
+app.use(notFoundRoute);
 
 app.get("/", (req: Request, res: Response) => {
   res.send(`Server is running on port ${config.port}`);
