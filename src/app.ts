@@ -3,6 +3,7 @@ import config from "./app/config";
 import cors from "cors";
 import { UserRoutes } from "./app/modules/user/user.routes";
 import notFoundRoute from "./app/error/notFound";
+import { BikeRoutes } from "./app/modules/bike/bike.routes";
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.get("/", (req: Request, res: Response) => {
 
 //routes
 app.use("/api", UserRoutes);
+app.use("/api", BikeRoutes);
 
 //unmatched route
 app.use(notFoundRoute);

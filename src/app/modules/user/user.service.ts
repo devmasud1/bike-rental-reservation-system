@@ -23,16 +23,7 @@ const getUserById = async (userId: string) => {
 };
 
 //update user
-// const updateUser = async (userId: string, updateData: Partial<TUser>) => {
-//   const user = await User.findByIdAndUpdate(userId, updateData, {
-//     new: true,
-//     runValidators: true,
-//   });
-//   if (!user) {
-//     throw new Error("User not found or update failed!");
-//   }
-//   return user;
-// };
+
 const updateUser = async (userId: string, updateData: Partial<TUser>) => {
   const user = await User.findByIdAndUpdate(userId, updateData, {
     new: true,
