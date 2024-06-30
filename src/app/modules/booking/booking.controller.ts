@@ -1,16 +1,16 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { BookingService } from "./booking.service";
 import sendResponse from "../../utils/sendResponse";
 import httpStatus from "http-status";
+import AppError from "../../error/appError";
 
-const createBooking = async (req: Request, res: Response) => {
+const createBooking = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const rentalData = req.body;
-
-    // if (!userId) {
-    //   throw new Error("User ID not found in request");
-    // }
-
     const result = await BookingService.createBookingIntoDB(rentalData);
 
     sendResponse(res, {
@@ -19,19 +19,22 @@ const createBooking = async (req: Request, res: Response) => {
       message: "Rental created successfully",
       data: result,
     });
-  } catch (error: any) {
-    sendResponse(res, {
-      statusCode: httpStatus.INTERNAL_SERVER_ERROR,
-      success: false,
-      message: "Failed to create rental!",
-      data: error.message,
-    });
+  } catch (error) {
+    next(error);
   }
 };
 
-const getAllBooking = async (req: Request, res: Response) => {
+const getAllBooking = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const result = await BookingService.getAllBookingDataFromDB();
+
+    if (Array.isArray(result) && result.length === 0) {
+      throw new AppError(httpStatus.NOT_FOUND, "No Data Found");
+    }
 
     sendResponse(res, {
       statusCode: httpStatus.OK,
@@ -39,17 +42,16 @@ const getAllBooking = async (req: Request, res: Response) => {
       message: "Rentals retrieved successfully",
       data: result,
     });
-  } catch (error: any) {
-    sendResponse(res, {
-      statusCode: httpStatus.INTERNAL_SERVER_ERROR,
-      success: false,
-      message: "Failed to retrieved rental!",
-      data: error.message,
-    });
+  } catch (error) {
+    next(error);
   }
 };
 
-const updateBookingIsReturnStatus = async (req: Request, res: Response) => {
+const updateBookingIsReturnStatus = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const bookingId = req.params.id;
     const result = await BookingService.updateBookingIsReturnStatusIntoDB(
@@ -62,13 +64,8 @@ const updateBookingIsReturnStatus = async (req: Request, res: Response) => {
       message: "Bike returned successfully",
       data: result,
     });
-  } catch (error: any) {
-    sendResponse(res, {
-      statusCode: httpStatus.INTERNAL_SERVER_ERROR,
-      success: false,
-      message: "Failed to retrieved bike!",
-      data: error.message,
-    });
+  } catch (error) {
+    next(error);
   }
 };
 

@@ -1,12 +1,12 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import httpStatus from "http-status";
 import { UserService } from "./user.service";
 import sendResponse from "../../utils/sendResponse";
+import AppError from "../../error/appError";
 
-const createUser = async (req: Request, res: Response) => {
+const createUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userData = req.body;
-
     const result = await UserService.createUserIntoDB(userData);
 
     sendResponse(res, {
@@ -15,21 +15,44 @@ const createUser = async (req: Request, res: Response) => {
       message: "User registered successfully",
       data: result,
     });
-  } catch (error: any) {
-    sendResponse(res, {
-      statusCode: httpStatus.INTERNAL_SERVER_ERROR,
-      success: false,
-      message: "Failed to create user!",
-      data: error.message, // Send error message for clarity
-    });
+  } catch (error) {
+    next(error);
   }
 };
 
-const getUserById = async (req: Request, res: Response) => {
+const getAllUser = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const result = await UserService.getAllUserFromDB();
+
+    if (Array.isArray(result) && result.length === 0) {
+      throw new AppError(httpStatus.NOT_FOUND, "No Data Found");
+    }
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "Users retrieved successfully",
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const getUserById = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { userId } = req.params;
 
     const result = await UserService.getUserById(userId);
+
+    if (!result) {
+      sendResponse(res, {
+        statusCode: httpStatus.NOT_FOUND,
+        success: false,
+        message: "No Data Found",
+        data: [],
+      });
+    }
 
     sendResponse(res, {
       statusCode: httpStatus.OK,
@@ -37,17 +60,12 @@ const getUserById = async (req: Request, res: Response) => {
       message: "User profile retrieved successfully",
       data: result,
     });
-  } catch (error: any) {
-    sendResponse(res, {
-      statusCode: httpStatus.NOT_FOUND,
-      success: false,
-      message: "Failed to retrieve user profile!",
-      data: error.message,
-    });
+  } catch (error) {
+    next(error);
   }
 };
 
-const updateUser = async (req: Request, res: Response) => {
+const updateUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { userId } = req.params;
     const updatedData = req.body;
@@ -60,18 +78,14 @@ const updateUser = async (req: Request, res: Response) => {
       message: "Profile updated successfully",
       data: result,
     });
-  } catch (error: any) {
-    sendResponse(res, {
-      statusCode: httpStatus.INTERNAL_SERVER_ERROR,
-      success: false,
-      message: "Failed to update user profile!",
-      data: error.message,
-    });
+  } catch (error) {
+    next(error);
   }
 };
 
 export const UserController = {
   createUser,
+  getAllUser,
   getUserById,
   updateUser,
 };

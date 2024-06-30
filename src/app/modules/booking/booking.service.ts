@@ -23,6 +23,10 @@ const createBookingIntoDB = async (bookingData: TBooking) => {
 const getAllBookingDataFromDB = async () => {
   const results = await Booking.find();
 
+  // if (results.length === 0) {
+  //   return { message: "no data" };
+  // }
+
   //format the response data
   const responseData = results.map((result) => ({
     _id: result._id,

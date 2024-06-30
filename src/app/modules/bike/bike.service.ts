@@ -1,3 +1,5 @@
+import httpStatus from "http-status";
+import AppError from "../../error/appError";
 import { TBike } from "./bike.interface";
 import { Bike } from "./bike.model";
 
@@ -16,17 +18,11 @@ const createBikeIntoDB = async (bikeId: TBike) => {
 //get all bike
 const getAllBikeFromDB = async () => {
   const result = await Bike.find();
-  if (!result) {
-    throw new Error("bike not found!");
-  }
   return result;
 };
 //get single bike
 const getSingleBikeFromDB = async (bikeId: string) => {
   const result = await Bike.findById(bikeId);
-  if (!result) {
-    throw new Error("bike not found!");
-  }
   return result;
 };
 
@@ -36,23 +32,12 @@ const updateBikeIntoDB = async (bikeId: string, updateData: Partial<TBike>) => {
     new: true,
     runValidators: true,
   });
-
-  if (!result) {
-    throw new Error("Bike not found or update failed!");
-  }
-
   return result;
 };
 
 const deleteBikeFromDB = async (bikeId: string) => {
-  try {
-    const deletedBike = await Bike.findByIdAndDelete(bikeId);
-
-    if (!deletedBike) {
-      throw new Error("Bike not found or deletion failed");
-    }
-    return deletedBike;
-  } catch (error) {}
+  const deletedBike = await Bike.findByIdAndDelete(bikeId);
+  return deletedBike;
 };
 
 export const BikeService = {

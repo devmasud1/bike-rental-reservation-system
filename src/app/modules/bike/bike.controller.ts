@@ -1,9 +1,10 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import httpStatus from "http-status";
 import sendResponse from "../../utils/sendResponse";
 import { BikeService } from "./bike.service";
+import AppError from "../../error/appError";
 
-const createBike = async (req: Request, res: Response) => {
+const createBike = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const bikeData = req.body;
 
@@ -15,58 +16,55 @@ const createBike = async (req: Request, res: Response) => {
       message: "Bike added successfully",
       data: result,
     });
-  } catch (error: any) {
-    sendResponse(res, {
-      statusCode: httpStatus.INTERNAL_SERVER_ERROR,
-      success: false,
-      message: "Failed to create bike!",
-      data: error.message,
-    });
+  } catch (error) {
+    next(error);
   }
 };
 
-const getAllBike = async (req: Request, res: Response) => {
+const getAllBike = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const result = await BikeService.getAllBikeFromDB();
 
+    if (Array.isArray(result) && result.length === 0) {
+      throw new AppError(httpStatus.NOT_FOUND, "No Data Found");
+    }
+
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
       message: "Bikes retrieved successfully",
       data: result,
     });
-  } catch (error: any) {
-    sendResponse(res, {
-      statusCode: httpStatus.NOT_FOUND,
-      success: false,
-      message: "Failed to retrieve bikes!",
-      data: error.message,
-    });
+  } catch (error) {
+    next(error);
   }
 };
-const getSingleBike = async (req: Request, res: Response) => {
-  try {
-    const { bikeId } = req.params;
 
+const getSingleBike = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { bikeId } = req.params;
+
+  try {
     const result = await BikeService.getSingleBikeFromDB(bikeId);
 
+    if (!result) {
+      throw new AppError(httpStatus.NOT_FOUND, "Bike not found");
+    }
+
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
-      message: "Bikes retrieved successfully",
+      message: "Bike retrieved successfully",
       data: result,
     });
-  } catch (error: any) {
-    sendResponse(res, {
-      statusCode: httpStatus.NOT_FOUND,
-      success: false,
-      message: "Failed to retrieve bikes!",
-      data: error.message,
-    });
+  } catch (error) {
+    next(error);
   }
 };
-
-const updateBike = async (req: Request, res: Response) => {
+const updateBike = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { bikeId } = req.params;
     const updatedData = req.body;
@@ -79,17 +77,12 @@ const updateBike = async (req: Request, res: Response) => {
       message: "Bike updated successfully",
       data: result,
     });
-  } catch (error: any) {
-    sendResponse(res, {
-      statusCode: httpStatus.INTERNAL_SERVER_ERROR,
-      success: false,
-      message: "Failed to update bike data!",
-      data: error.message,
-    });
+  } catch (error) {
+    next(error);
   }
 };
 
-const deleteBike = async (req: Request, res: Response) => {
+const deleteBike = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { bikeId } = req.params;
     const result = await BikeService.deleteBikeFromDB(bikeId);
@@ -100,12 +93,8 @@ const deleteBike = async (req: Request, res: Response) => {
       message: "Bike deleted successfully",
       data: result,
     });
-  } catch (error: any) {
-    res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
-      success: false,
-      message: "Failed to delete bike!",
-      error: error.message,
-    });
+  } catch (error) {
+    next(error);
   }
 };
 

@@ -2,9 +2,10 @@ import express, { Request, Response } from "express";
 import config from "./app/config";
 import cors from "cors";
 import { UserRoutes } from "./app/modules/user/user.routes";
-import notFoundRoute from "./app/error/notFound";
+import notFoundRoute from "./app/middleware/notFound";
 import { BikeRoutes } from "./app/modules/bike/bike.routes";
 import { BookingRoutes } from "./app/modules/booking/booking.routes";
+import globalErrorHandler from "./app/middleware/globalErrorHandler";
 
 const app = express();
 
@@ -28,8 +29,11 @@ app.use("/api", BookingRoutes);
 //unmatched route
 app.use(notFoundRoute);
 
-app.get("/", (req: Request, res: Response) => {
-  res.send(`Server is running on port ${config.port}`);
-});
+//globalErrorHandler
+app.use(globalErrorHandler);
+
+// app.get("/", (req: Request, res: Response) => {
+//   res.send(`Server is running on port ${config.port}`);
+// });
 
 export default app;
