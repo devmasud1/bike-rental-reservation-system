@@ -3,8 +3,8 @@ import { Types } from "mongoose";
 export type TBooking = {
   userId: Types.ObjectId;
   bikeId: Types.ObjectId;
-  startTime: string;
-  returnTime?: string | null;
-  totalCost: number;
+  startTime: Date;
+  returnTime?: Date | null;
+  totalCost?: number;
   isReturned: boolean;
 };

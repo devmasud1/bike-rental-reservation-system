@@ -12,4 +12,10 @@ router.post(
   BookingController.createBooking
 );
 
+router.get("/rentals", BookingController.getAllBooking);
+router.put(
+  "/rentals/:id/return",
+  BookingController.updateBookingIsReturnStatus
+);
+
 export const BookingRoutes = router;

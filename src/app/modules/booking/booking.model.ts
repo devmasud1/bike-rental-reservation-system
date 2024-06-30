@@ -14,11 +14,11 @@ const bookingSchema = new Schema<TBooking>(
       ref: "Bike",
     },
     startTime: {
-      type: String,
+      type: Date,
       required: true,
     },
     returnTime: {
-      type: String,
+      type: Date,
     },
     totalCost: {
       type: Number,
