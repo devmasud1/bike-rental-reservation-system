@@ -20,6 +20,36 @@ const createUser = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
+const loggedUser = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      sendResponse(res, {
+        statusCode: httpStatus.NOT_FOUND,
+        success: false,
+        message: "Email and password are required",
+        data: "",
+      });
+    }
+
+    const user = await UserService.loggedInUserIntoDB(email, password);
+
+    if (!user) {
+      throw new AppError(httpStatus.NOT_FOUND, "Invalid credentials!");
+    }
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: "User logged in successfully",
+      data: user,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 const getAllUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const result = await UserService.getAllUserFromDB();
@@ -85,6 +115,7 @@ const updateUser = async (req: Request, res: Response, next: NextFunction) => {
 
 export const UserController = {
   createUser,
+  loggedUser,
   getAllUser,
   getUserById,
   updateUser,
