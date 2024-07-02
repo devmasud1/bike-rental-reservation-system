@@ -3,6 +3,9 @@ import { TBooking } from "./booking.interface";
 import { Bike } from "../bike/bike.model";
 import AppError from "../../error/appError";
 import httpStatus from "http-status";
+import { Types } from "mongoose";
+
+const { ObjectId } = Types;
 
 const createBookingIntoDB = async (bookingData: TBooking) => {
   const bikeId = bookingData.bikeId;
@@ -37,12 +40,12 @@ const createBookingIntoDB = async (bookingData: TBooking) => {
   return responseData;
 };
 
-const getAllBookingDataFromDB = async () => {
-  const results = await Booking.find();
+const getAllBookingDataFromDB = async (userId: string) => {
+  if (!ObjectId.isValid(userId)) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Invalid user ID format.");
+  }
 
-  // if (results.length === 0) {
-  //   return { message: "no data" };
-  // }
+  const results = await Booking.find({ userId: new ObjectId(userId) });
 
   //format the response data
   const responseData = results.map((result) => ({

@@ -13,7 +13,7 @@ router.post(
   BookingController.createBooking
 );
 
-router.get("/rentals", BookingController.getAllBooking);
+router.get("/rentals", authenticate, BookingController.getAllBooking);
 router.put(
   "/rentals/:id/return",
   authenticate,

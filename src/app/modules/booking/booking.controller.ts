@@ -36,14 +36,20 @@ const getAllBooking = async (
   next: NextFunction
 ) => {
   try {
-    const result = await BookingService.getAllBookingDataFromDB();
+    const userId = req.user?.userId;
+    console.log("id", userId);
 
-    if (Array.isArray(result) && result.length === 0) {
-      // Return a 404 response if no data is found
+    if (!userId) {
+      throw new AppError(httpStatus.BAD_REQUEST, "User ID not found!");
+    }
+
+    const booking = await BookingService.getAllBookingDataFromDB(userId);
+
+    if (booking.length === 0) {
       return sendResponse(res, {
         statusCode: httpStatus.NOT_FOUND,
         success: false,
-        message: "No Data Found",
+        message: "No Rentals Found for the User!",
         data: [],
       });
     }
@@ -52,7 +58,7 @@ const getAllBooking = async (
       statusCode: httpStatus.OK,
       success: true,
       message: "Rentals retrieved successfully",
-      data: result,
+      data: booking,
     });
   } catch (error) {
     next(error);
