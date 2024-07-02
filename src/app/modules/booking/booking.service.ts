@@ -62,10 +62,10 @@ const updateBookingIsReturnStatusIntoDB = async (bookingId: string) => {
   const booking = await Booking.findById(bookingId);
 
   if (!booking) {
-    throw new Error("Rental not found");
+    throw new AppError(httpStatus.NOT_FOUND, "Rental not found!");
   }
   if (booking.isReturned) {
-    throw new Error("Bike is already returned");
+    throw new AppError(httpStatus.NOT_ACCEPTABLE, "Bike is already returned!");
   }
 
   //calculate the cost
