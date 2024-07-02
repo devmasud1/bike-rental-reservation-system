@@ -1,8 +1,25 @@
 import { Booking } from "./booking.model";
 import { TBooking } from "./booking.interface";
 import { Bike } from "../bike/bike.model";
+import AppError from "../../error/appError";
+import httpStatus from "http-status";
 
 const createBookingIntoDB = async (bookingData: TBooking) => {
+  const bikeId = bookingData.bikeId;
+
+  //check bike available or not
+  const bike = await Bike.findById(bikeId);
+  if (!bike || !bike.isAvailable) {
+    throw new AppError(
+      httpStatus.NOT_ACCEPTABLE,
+      "selected bike is not available for rental!"
+    );
+  }
+
+  //set bike availability to false
+  bike.isAvailable = false;
+  await bike.save();
+
   //create new booking
   const result = await Booking.create(bookingData);
 

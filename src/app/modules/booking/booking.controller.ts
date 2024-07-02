@@ -10,7 +10,13 @@ const createBooking = async (
   next: NextFunction
 ) => {
   try {
-    const rentalData = req.body;
+    const rentalData = {
+      userId: req.user?.userId,
+      bikeId: req.body.bikeId,
+      startTime: new Date(req.body.startTime),
+      isReturned: false,
+    };
+
     const result = await BookingService.createBookingIntoDB(rentalData);
 
     sendResponse(res, {
