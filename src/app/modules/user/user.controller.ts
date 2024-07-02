@@ -9,11 +9,20 @@ const createUser = async (req: Request, res: Response, next: NextFunction) => {
     const userData = req.body;
     const result = await UserService.createUserIntoDB(userData);
 
+    // Set refresh token as cookie
+    res.cookie("refreshToken", result.tokens.refreshToken, {
+      secure: process.env.NODE_ENV === "production",
+      httpOnly: true,
+    });
+
     sendResponse(res, {
       statusCode: httpStatus.CREATED,
       success: true,
       message: "User registered successfully",
-      data: result,
+      data: {
+        user: result.user,
+        accessToken: result.tokens.accessToken,
+      },
     });
   } catch (error) {
     next(error);
@@ -25,25 +34,28 @@ const loggedUser = async (req: Request, res: Response, next: NextFunction) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      sendResponse(res, {
-        statusCode: httpStatus.NOT_FOUND,
-        success: false,
-        message: "Email and password are required",
-        data: "",
-      });
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        "Email and password are required"
+      );
     }
 
-    const user = await UserService.loggedInUserIntoDB(email, password);
+    const result = await UserService.loggedInUserIntoDB(email, password);
 
-    if (!user) {
-      throw new AppError(httpStatus.NOT_FOUND, "Invalid credentials!");
-    }
+    //set refresh token as cookie
+    res.cookie("refreshToken", result.tokens.refreshToken, {
+      secure: process.env.NODE_ENV === "production",
+      httpOnly: true,
+    });
 
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
       message: "User logged in successfully",
-      data: user,
+      data: {
+        user: result.user,
+        accessToken: result.tokens.accessToken,
+      },
     });
   } catch (error) {
     next(error);
@@ -52,10 +64,11 @@ const loggedUser = async (req: Request, res: Response, next: NextFunction) => {
 
 const getAllUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const result = await UserService.getAllUserFromDB();
+    const { role } = req.user as { role: string };
+    const result = await UserService.getAllUserFromDB(role);
 
     if (Array.isArray(result) && result.length === 0) {
-      throw new AppError(httpStatus.NOT_FOUND, "No Data Found");
+      throw new AppError(httpStatus.NOT_FOUND, "No Data Found!");
     }
 
     sendResponse(res, {
@@ -69,14 +82,13 @@ const getAllUser = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-const getUserById = async (req: Request, res: Response, next: NextFunction) => {
+const getProfile = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { userId } = req.params;
+    const userId = req.user.userId;
+    const user = await UserService.getProfileById(userId);
 
-    const result = await UserService.getUserById(userId);
-
-    if (!result) {
-      sendResponse(res, {
+    if (!user) {
+      return sendResponse(res, {
         statusCode: httpStatus.NOT_FOUND,
         success: false,
         message: "No Data Found",
@@ -88,19 +100,23 @@ const getUserById = async (req: Request, res: Response, next: NextFunction) => {
       statusCode: httpStatus.OK,
       success: true,
       message: "User profile retrieved successfully",
-      data: result,
+      data: user,
     });
   } catch (error) {
     next(error);
   }
 };
 
-const updateUser = async (req: Request, res: Response, next: NextFunction) => {
+const updateProfile = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
-    const { userId } = req.params;
+    const userId = req.user?.userId;
     const updatedData = req.body;
 
-    const result = await UserService.updateUser(userId, updatedData);
+    const result = await UserService.updateProfile(userId, updatedData);
 
     sendResponse(res, {
       statusCode: httpStatus.OK,
@@ -117,6 +133,6 @@ export const UserController = {
   createUser,
   loggedUser,
   getAllUser,
-  getUserById,
-  updateUser,
+  getProfile,
+  updateProfile,
 };

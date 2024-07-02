@@ -33,7 +33,13 @@ const getAllBooking = async (
     const result = await BookingService.getAllBookingDataFromDB();
 
     if (Array.isArray(result) && result.length === 0) {
-      throw new AppError(httpStatus.NOT_FOUND, "No Data Found");
+      // Return a 404 response if no data is found
+      return sendResponse(res, {
+        statusCode: httpStatus.NOT_FOUND,
+        success: false,
+        message: "No Data Found",
+        data: [],
+      });
     }
 
     sendResponse(res, {

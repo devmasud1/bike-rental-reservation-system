@@ -3,8 +3,9 @@ import { TUser } from "./user.interface";
 import AppError from "../../error/appError";
 import httpStatus from "http-status";
 import bcrypt from "bcryptjs";
+import { generateToken } from "../../utils/jwt";
 
-//check userExists
+// Check if user exists
 const userExists = async (userId: string) => {
   const user = await User.findById(userId);
   return !!user;
@@ -16,51 +17,71 @@ const createUserIntoDB = async (userData: TUser) => {
   const hashedPassword = await bcrypt.hash(userData.password, salt);
   userData.password = hashedPassword;
   const result = await User.create(userData);
-  return result;
+
+  //generate tokens for the new user
+  const accessToken = generateToken(result._id.toString(), result.role);
+  const refreshToken = generateToken(result._id.toString(), result.role);
+
+  return {
+    user: result,
+    tokens: {
+      accessToken,
+      refreshToken,
+    },
+  };
 };
 
-//logged in user
+//Logged in user
 const loggedInUserIntoDB = async (email: string, password: string) => {
   const user = await User.findOne({ email });
 
   if (!user) {
-    throw new AppError(httpStatus.NOT_FOUND, "user not found!");
+    throw new AppError(httpStatus.NOT_FOUND, "User not found!");
   }
 
-  const isMatch = await bcrypt.compare(password, user?.password);
+  const isMatch = await bcrypt.compare(password, user.password);
 
   if (!isMatch) {
-    throw new Error("Invalid credentials");
+    throw new AppError(httpStatus.FORBIDDEN, "Invalid credentials");
   }
 
+  const accessToken = generateToken(user._id.toString(), user.role);
+  const refreshToken = generateToken(user._id.toString(), user.role);
+
   return {
-    _id: user?._id,
-    name: user?.name,
-    email: user?.email,
-    phone: user?.phone,
-    address: user?.address,
-    role: user?.role,
+    user,
+    tokens: {
+      accessToken,
+      refreshToken,
+    },
   };
 };
 
-//get allUser
-const getAllUserFromDB = async () => {
-  const result = User.find();
+//get all profile only admin
+const getAllUserFromDB = async (role: string) => {
+  if (role !== "admin") {
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      "You are not authorized to access this route"
+    );
+  }
+  const result = await User.find();
   return result;
 };
 
-//get single user
-const getUserById = async (userId: string) => {
+//get single profile
+const getProfileById = async (userId: string) => {
   const user = await User.findById(userId);
   return user;
 };
 
-//update user
-const updateUser = async (userId: string, updateData: Partial<TUser>) => {
+//update profile
+const updateProfile = async (userId: string, updateData: Partial<TUser>) => {
   const user = await User.findByIdAndUpdate(userId, updateData, {
     new: true,
     runValidators: true,
   });
+  console.log("user", user);
 
   if (!user) {
     throw new AppError(
@@ -69,7 +90,6 @@ const updateUser = async (userId: string, updateData: Partial<TUser>) => {
     );
   }
 
-  // Extract only the fields those i want to send the response
   const { _id, name, email, phone, address, role } = user;
 
   return { _id, name, email, phone, address, role };
@@ -80,6 +100,6 @@ export const UserService = {
   createUserIntoDB,
   loggedInUserIntoDB,
   getAllUserFromDB,
-  getUserById,
-  updateUser,
+  getProfileById,
+  updateProfile,
 };
