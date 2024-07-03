@@ -1,6 +1,6 @@
 ## Bike Rental Reservation System Backend
 
-##### live-Site:: [https://assignment2-fawn-seven.vercel.app/](https://bike-rental-service-azure-seven.vercel.app/)
+##### live-Site:: [https://bike-rental-service-azure-seven.vercel.app/](https://bike-rental-service-azure-seven.vercel.app/)
 
 This project serves as the backend for a bike rental reservation system, facilitating the management of users, bikes, and rentals. It provides essential functionalities for user authentication and authorization, bike inventory management, and rental operations. The system ensures data consistency through input validation and robust error handling mechanisms.
 
@@ -31,16 +31,16 @@ This project serves as the backend for a bike rental reservation system, facilit
    - git clone <https://github.com/devmasud1/bike-rental-reservation-system>
    - cd bike-rental-reservation-system
 2. Install the dependencies:
-   npm install
+   - npm install
 3. Create a .env file in the root directory and add your environment variables:
-   NODE_ENV=development
-   PORT=5000
-   DB_URL=your_mongodb_uri_here
-   BCRYPT_SALT_ROUNDS=your_salt_here
-   JWT_ACCESS_TOKEN=your_secret_key_here
-   JWT_REFRESH_TOKEN=your_secret_key_here
+   - NODE_ENV=development
+   - PORT=5000
+   - DB_URL=your_mongodb_uri_here
+   - BCRYPT_SALT_ROUNDS=your_salt_here
+   - JWT_ACCESS_TOKEN=your_secret_key_here
+   - JWT_REFRESH_TOKEN=your_secret_key_here
 4. Start the development server:
-   npm run start:dev
+   - npm run start:dev
 
 #### API Endpoints
 
