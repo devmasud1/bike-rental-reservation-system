@@ -14,7 +14,17 @@ const createBike = async (req: Request, res: Response, next: NextFunction) => {
       statusCode: httpStatus.OK,
       success: true,
       message: "Bike added successfully",
-      data: result,
+      data: {
+        _id: result._id,
+        name: result.name,
+        description: result.description,
+        pricePerHour: result.pricePerHour,
+        isAvailable: result.isAvailable,
+        cc: result.cc,
+        year: result.year,
+        model: result.model,
+        brand: result.brand,
+      },
     });
   } catch (error) {
     next(error);

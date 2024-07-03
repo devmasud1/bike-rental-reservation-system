@@ -2,21 +2,28 @@ import express from "express";
 import validateRequest from "../../middleware/validateRequest";
 import { bikeValidation } from "./bike.validation";
 import { BikeController } from "./bike.controller";
+import { authenticate, authorizeAdmin } from "../../middleware/authMiddleware";
 
 const router = express.Router();
 
 router.post(
-  "/bikes",
+  "/",
+  authorizeAdmin,
   validateRequest(bikeValidation.bikeValidationSchema),
   BikeController.createBike
 );
 
-router.get("/bikes", BikeController.getAllBike);
+router.get("/", BikeController.getAllBike);
 
-router.get("/bikes/:bikeId", BikeController.getSingleBike);
+router.get("/:bikeId", BikeController.getSingleBike);
 
-router.put("/bikes/:bikeId", BikeController.updateBike);
+router.put("/:bikeId", authenticate, authorizeAdmin, BikeController.updateBike);
 
-router.delete("/bikes/:bikeId", BikeController.deleteBike);
+router.delete(
+  "/:bikeId",
+  authenticate,
+  authorizeAdmin,
+  BikeController.deleteBike
+);
 
 export const BikeRoutes = router;

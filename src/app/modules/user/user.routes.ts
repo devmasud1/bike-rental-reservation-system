@@ -4,19 +4,21 @@ import { userValidation } from "./user.validation";
 import validateRequest from "../../middleware/validateRequest";
 import { authenticate } from "../../middleware/authMiddleware";
 
-const router = express.Router();
+const authRouter = express.Router();
+const userRouter = express.Router();
 
 //Public routes
-router.post(
-  "/auth/signup",
+authRouter.post(
+  "/signup",
   validateRequest(userValidation.userValidationSchema),
   UserController.createUser
 );
-router.post("/auth/login", UserController.loggedUser);
+authRouter.post("/login", UserController.loggedUser);
 
 //Protected routes
-router.get("/users", authenticate, UserController.getAllUser);
-router.get("/users/me", authenticate, UserController.getProfile);
-router.put("/users/me", authenticate, UserController.updateProfile);
+userRouter.get("/", authenticate, UserController.getAllUser);
+userRouter.get("/me", authenticate, UserController.getProfile);
+userRouter.put("/me", authenticate, UserController.updateProfile);
 
-export const UserRoutes = router;
+export const AuthRouter = authRouter;
+export const UserRoutes = userRouter;

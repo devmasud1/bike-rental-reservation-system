@@ -9,7 +9,7 @@ const createUser = async (req: Request, res: Response, next: NextFunction) => {
     const userData = req.body;
     const result = await UserService.createUserIntoDB(userData);
 
-    // Set refresh token as cookie
+    //set refresh token as cookie
     res.cookie("refreshToken", result.tokens.refreshToken, {
       secure: process.env.NODE_ENV === "production",
       httpOnly: true,
@@ -20,8 +20,15 @@ const createUser = async (req: Request, res: Response, next: NextFunction) => {
       success: true,
       message: "User registered successfully",
       data: {
-        user: result.user,
-        accessToken: result.tokens.accessToken,
+        _id: result.user?._id,
+        name: result.user?.name,
+        email: result.user?.email,
+        phone: result.user?.phone,
+        address: result.user?.address,
+        role: result.user?.role,
+        createdAt: result.user?.createdAt,
+        updatedAt: result.user?.updatedAt,
+        __v: result.user.__v,
       },
     });
   } catch (error) {
@@ -52,9 +59,17 @@ const loggedUser = async (req: Request, res: Response, next: NextFunction) => {
       statusCode: httpStatus.OK,
       success: true,
       message: "User logged in successfully",
+      token: result.tokens.accessToken,
       data: {
-        user: result.user,
-        accessToken: result.tokens.accessToken,
+        _id: result.user._id,
+        name: result.user.name,
+        email: result.user.email,
+        phone: result.user.phone,
+        address: result.user.address,
+        role: result.user.role,
+        createdAt: result.user.createdAt,
+        updatedAt: result.user.updatedAt,
+        __v: result.user.__v,
       },
     });
   } catch (error) {
@@ -85,6 +100,7 @@ const getAllUser = async (req: Request, res: Response, next: NextFunction) => {
 const getProfile = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userId = req.user.userId;
+
     const user = await UserService.getProfileById(userId);
 
     if (!user) {
@@ -96,11 +112,14 @@ const getProfile = async (req: Request, res: Response, next: NextFunction) => {
       });
     }
 
+    //send response without password
+    const { password, ...profileWithoutPassword } = user.toObject();
+
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
       message: "User profile retrieved successfully",
-      data: user,
+      data: profileWithoutPassword,
     });
   } catch (error) {
     next(error);

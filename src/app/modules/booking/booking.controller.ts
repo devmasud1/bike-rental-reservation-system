@@ -71,7 +71,7 @@ const updateBookingIsReturnStatus = async (
   next: NextFunction
 ) => {
   try {
-    const bookingId = req.params.id;
+    const bookingId = req.params?.id;
     const result = await BookingService.updateBookingIsReturnStatusIntoDB(
       bookingId
     );

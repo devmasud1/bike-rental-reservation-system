@@ -7,15 +7,15 @@ import { authenticate, authorizeAdmin } from "../../middleware/authMiddleware";
 const router = express.Router();
 
 router.post(
-  "/rentals",
+  "/",
   authenticate,
   validateRequest(BookingValidation.createBookingValidationSchema),
   BookingController.createBooking
 );
 
-router.get("/rentals", authenticate, BookingController.getAllBooking);
+router.get("/", authenticate, BookingController.getAllBooking);
 router.put(
-  "/rentals/:id/return",
+  "/:id/return",
   authenticate,
   authorizeAdmin,
   BookingController.updateBookingIsReturnStatus
