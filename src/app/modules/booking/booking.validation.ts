@@ -39,7 +39,8 @@ const updateBookingValidationSchema = z.object({
     .number({
       invalid_type_error: "Total cost must be a number",
     })
-    .min(0, { message: "Total cost must be a positive number" }),
+    .min(0, { message: "Total cost must be a positive number" })
+    .optional(),
   isReturned: z
     .boolean({
       invalid_type_error: "isReturned must be a boolean",
