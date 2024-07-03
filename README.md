@@ -1,6 +1,6 @@
 ## Bike Rental Reservation System Backend
 
-live-Site::<([https://assignment2-fawn-seven.vercel.app/](https://bike-rental-service-azure-seven.vercel.app/))>
+##### live-Site:: [https://assignment2-fawn-seven.vercel.app/](https://bike-rental-service-azure-seven.vercel.app/)
 
 This project serves as the backend for a bike rental reservation system, facilitating the management of users, bikes, and rentals. It provides essential functionalities for user authentication and authorization, bike inventory management, and rental operations. The system ensures data consistency through input validation and robust error handling mechanisms.
 
@@ -28,8 +28,8 @@ This project serves as the backend for a bike rental reservation system, facilit
 #### Steps
 
 1. Clone the repository:
-   git clone <https://github.com/devmasud1/bike-rental-reservation-system>
-   cd bike-rental-reservation-system
+   - git clone <https://github.com/devmasud1/bike-rental-reservation-system>
+   - cd bike-rental-reservation-system
 2. Install the dependencies:
    npm install
 3. Create a .env file in the root directory and add your environment variables:
