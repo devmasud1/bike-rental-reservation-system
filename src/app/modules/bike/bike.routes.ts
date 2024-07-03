@@ -8,6 +8,7 @@ const router = express.Router();
 
 router.post(
   "/",
+  authenticate,
   authorizeAdmin,
   validateRequest(bikeValidation.bikeValidationSchema),
   BikeController.createBike
@@ -17,7 +18,13 @@ router.get("/", BikeController.getAllBike);
 
 router.get("/:bikeId", BikeController.getSingleBike);
 
-router.put("/:bikeId", authenticate, authorizeAdmin, BikeController.updateBike);
+router.put(
+  "/:bikeId",
+  authenticate,
+  authorizeAdmin,
+  validateRequest(bikeValidation.updateBikeValidationSchema),
+  BikeController.updateBike
+);
 
 router.delete(
   "/:bikeId",

@@ -7,7 +7,7 @@ import { authenticate } from "../../middleware/authMiddleware";
 const authRouter = express.Router();
 const userRouter = express.Router();
 
-//Public routes
+//public routes
 authRouter.post(
   "/signup",
   validateRequest(userValidation.userValidationSchema),
@@ -15,10 +15,15 @@ authRouter.post(
 );
 authRouter.post("/login", UserController.loggedUser);
 
-//Protected routes
+//protected routes
 userRouter.get("/", authenticate, UserController.getAllUser);
 userRouter.get("/me", authenticate, UserController.getProfile);
-userRouter.put("/me", authenticate, UserController.updateProfile);
+userRouter.put(
+  "/me",
+  authenticate,
+  validateRequest(userValidation.updateValidationSchema),
+  UserController.updateProfile
+);
 
 export const AuthRouter = authRouter;
 export const UserRoutes = userRouter;

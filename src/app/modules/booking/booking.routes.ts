@@ -14,10 +14,12 @@ router.post(
 );
 
 router.get("/", authenticate, BookingController.getAllBooking);
+
 router.put(
   "/:id/return",
   authenticate,
   authorizeAdmin,
+  validateRequest(BookingValidation.updateBookingValidationSchema),
   BookingController.updateBookingIsReturnStatus
 );
 
